@@ -17,6 +17,17 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 	class EIFS_Fixture_Importer extends SP_Importer {
 
 		/**
+		 * Array to store team IDs during import process.
+		 * 
+		 * This property accumulates team IDs as they are processed during the import,
+		 * allowing for tracking and potential post-processing of imported teams.
+		 * 
+		 * @since 1.0
+		 * @var array
+		 */
+		public $teams_ids = array();
+
+		/**
 		 * __construct function.
 		 *
 		 * @access public
@@ -31,11 +42,11 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 				'sp_venue'  	=> esc_attr__( 'Venue', 'sportspress' ),
 				'sp_home'   	=> esc_attr__( 'Home', 'sportspress' ),
 				'sp_away'   	=> esc_attr__( 'Away', 'sportspress' ),
+				'sp_home_score' => esc_attr__( 'Home Score', 'enhanced-import-for-sportspress' ),
+				'sp_away_score' => esc_attr__( 'Away Score', 'enhanced-import-for-sportspress' ),
 				'sp_day'    	=> esc_attr__( 'Match Day', 'sportspress' ),
-				'sp_home_score' => esc_attr__( 'Home Score', 'sportspress' ),
-				'sp_away_score' => esc_attr__( 'Away Score', 'sportspress' ),
 			);
-			$this->optionals    = array( 'sp_day', 'sp_home_score', 'sp_away_score' );
+			$this->optionals    = array( 'sp_home_score', 'sp_away_score', 'sp_day' );
 		}
 
 		/**
@@ -249,6 +260,8 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 								wp_update_post( $post );
 
 							endif;
+							// Create teams array
+							$this->teams_ids[] = $team_id ;
 
 						else :
 
@@ -272,10 +285,164 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 				}
 			endforeach;
 
-			// Show Result
+			/* Start League Table and Calendar logic */
+			
+			// Remove duplicates from teams_ids array
+			$teams_clean = array_unique( $this->teams_ids );
+
+			// Get league and season objects by slug
+			$league_object = get_term_by( 'slug', $league, 'sp_league');
+			$season_object = get_term_by( 'slug', $season, 'sp_season');
+
+			// Get league and season IDs
+			$league_id = $league_object->term_id;
+			$season_id = $season_object->term_id;
+			
+			if ( isset( $_POST['eifs_auto_create_calendar'] ) && $_POST['eifs_auto_create_calendar'] == 'yes' ) {
+				// Check if a calendar exists for the league and season
+				$args = array(
+					'post_type' => array('sp_calendar'),
+					'post_status' => 'publish',
+					'posts_per_page' => 1,
+					'no_found_rows' => true,
+					'orderby' => 'post_date ID',
+					'order' => 'ASC',
+					'tax_query' => array(
+					'relation' => 'AND',
+						array(
+							'taxonomy' => 'sp_league',
+							'field' => 'term_id',
+							'terms' => $league_id,
+						),
+						array(
+							'taxonomy' => 'sp_season',
+							'field' => 'term_id',
+							'terms' => $season_id,
+						)
+					)
+				);
+				$calendars = new WP_Query( $args );
+				if ( ! empty( $calendars->post ) ) {
+					$calendar_id = $calendars->ID;
+				} else {
+					// Create new calendar.
+					$calendar_id = wp_insert_post(
+									array(
+										'post_type'   => 'sp_calendar',
+										'post_status' => 'publish',
+										'post_title'  => wp_strip_all_tags( $league_object->name . ' ' . $season_object->name ), //Add league and season name to calendar title.
+									)
+								);
+					// Set league and season terms to the new calendar.
+					wp_set_object_terms( $calendar_id, $league, 'sp_league', true );
+					wp_set_object_terms( $calendar_id, $season, 'sp_season', true );
+
+					// Set calendar format to list.
+					update_post_meta( $calendar_id, 'sp_format', 'list' );
+				}
+			}
+			if ( isset( $_POST['eifs_auto_create_league_table'] ) && $_POST['eifs_auto_create_league_table'] == 'yes' ) {
+				// Check if a table exists for the league and season
+				$args = array(
+					'post_type' => array('sp_table'),
+					'post_status' => 'publish',
+					'posts_per_page' => 1,
+					'no_found_rows' => true,
+					'orderby' => 'post_date ID',
+					'order' => 'ASC',
+					'tax_query' => array(
+					'relation' => 'AND',
+						array(
+							'taxonomy' => 'sp_league',
+							'field' => 'term_id',
+							'terms' => $league_id,
+						),
+						array(
+							'taxonomy' => 'sp_season',
+							'field' => 'term_id',
+							'terms' => $season_id,
+						)
+					)
+				);
+				$tables = new WP_Query( $args );
+				if ( ! empty( $tables->post ) ) {
+					$table_id = $tables->ID;
+				}else{
+					$table_id = wp_insert_post(
+									array(
+										'post_type'   => 'sp_table',
+										'post_status' => 'publish',
+										'post_title'  => wp_strip_all_tags( $league_object->name . ' ' . $season_object->name ), //Add league and season name to calendar title.
+									)
+								);
+					// Set league and season terms to the new table.
+					wp_set_object_terms( $table_id, $league, 'sp_league', true );
+					wp_set_object_terms( $table_id, $season, 'sp_season', true );
+				}
+				// Add teams to table.
+				foreach ( $teams_clean as $team_clean_id ) {
+					add_post_meta( $table_id, 'sp_team', $team_clean_id );
+				}
+				// Set table mode to manual.
+				update_post_meta( $table_id, 'sp_select', 'manual' );
+				// Add by default all columns to the table.
+				$columns_args  = array(
+					'post_type'      => 'sp_column',
+					'numberposts'    => -1,
+					'posts_per_page' => -1,
+					'orderby'        => 'menu_order',
+					'order'          => 'ASC',
+				);
+				$columns = new WP_Query( $columns_args );
+				$sp_import_columns = array();
+				foreach ( $columns as $column ) {
+					$sp_import_columns[] = $column->post_name;
+				}
+				update_post_meta( $table_id, 'sp_columns', $sp_import_columns );
+			}
+			/* End League Table and Calendar logic */
+
+			// Show Result.
 			echo '<div class="updated settings-error below-h2"><p>
 				' . wp_kses_post( sprintf( __( 'Import complete - imported <strong>%1$s</strong> events and skipped <strong>%2$s</strong>.', 'sportspress' ), esc_html( $this->imported ), esc_html( $this->skipped ) ) ) . '
 			</p></div>';
+
+			// Show if a table and/or a calendar were created, with links, and how many teams assigned to the new table.
+			// Table message.
+			if ( isset( $table_id ) && ! empty( $table_id ) ) {
+				$table_edit_link = get_edit_post_link( $table_id );
+				$table_title     = get_the_title( $table_id );
+				$teams_count     = isset( $teams_clean ) && is_array( $teams_clean ) ? count( $teams_clean ) : 0;
+
+				echo '<div class="notice notice-success is-dismissible"><p>';
+				printf(
+					/* translators: 1: Table title, 2: Edit link, 3: Number of teams */
+					wp_kses_post(
+						__( 'Table <strong>%1$s</strong> was created. <a href="%2$s">Edit Table</a>. <br />Assigned <strong>%3$d</strong> teams to the table.', 'sportspress' )
+					),
+					esc_html( $table_title ),
+					esc_url( $table_edit_link ),
+					intval( $teams_count )
+				);
+				echo '</p></div>';
+			}
+
+			// Calendar message
+			if ( isset( $calendar_id ) && ! empty( $calendar_id ) ) {
+				$calendar_edit_link = get_edit_post_link( $calendar_id );
+				$calendar_title     = get_the_title( $calendar_id );
+
+				echo '<div class="notice notice-success is-dismissible"><p>';
+				printf(
+					/* translators: 1: Calendar title, 2: Edit link */
+					wp_kses_post(
+						__( 'Calendar <strong>%1$s</strong> was created. <a href="%2$s">Edit Calendar</a>.', 'sportspress' )
+					),
+					esc_html( $calendar_title ),
+					esc_url( $calendar_edit_link )
+				);
+				echo '</p></div>';
+			}
 
 			$this->import_end();
 		}
@@ -315,7 +482,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 			<table class="form-table">
 				<tbody>
 					<tr>
-						<th scope="row"><label><?php esc_html_e( 'Format', 'sportspress' ); ?>DEVELOPMENT</label><br/></th>
+						<th scope="row"><label><?php esc_html_e( 'Format', 'sportspress' ); ?></label><br/></th>
 						<td class="forminp forminp-radio" id="sp_formatdiv">
 							<fieldset id="post-formats-select">
 								<ul>
@@ -374,6 +541,40 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 									</li>
 									<li>
 										<label><input name="sp_date_format" value="mm/dd/yyyy" type="radio"> mm/dd/yyyy</label>
+									</li>
+								</ul>
+							</fieldset>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row" class="titledesc">
+							<?php esc_html_e( 'Auto create League Table', 'enhanced-import-for-sportspress' ); ?>
+						</th>
+						<td class="forminp forminp-radio">
+							<fieldset>
+								<ul>
+									<li>
+										<label><input name="eifs_auto_create_league_table" value="yes" type="radio"> Yes</label>
+									</li>
+									<li>
+										<label><input name="eifs_auto_create_league_table" value="no" type="radio" checked> No</label>
+									</li>
+								</ul>
+							</fieldset>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row" class="titledesc">
+							<?php esc_html_e( 'Auto create Calendar', 'enhanced-import-for-sportspress' ); ?>
+						</th>
+						<td class="forminp forminp-radio">
+							<fieldset>
+								<ul>
+									<li>
+										<label><input name="eifs_auto_create_calendar" value="yes" type="radio"> Yes</label>
+									</li>
+									<li>
+										<label><input name="eifs_auto_create_calendar" value="no" type="radio" checked> No</label>
 									</li>
 								</ul>
 							</fieldset>
