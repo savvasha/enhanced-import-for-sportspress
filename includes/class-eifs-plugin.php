@@ -35,6 +35,7 @@ class EIFS_Plugin {
     public function eifs_replace_fixture_importer_callback( array $importers ): array {
         if ( isset( $importers['sp_fixture_csv'] ) ) {
             $importers['sp_fixture_csv']['callback'] = [ $this, 'eifs_fixtures_importer' ];
+            $importers['sp_fixture_csv']['name'] = esc_attr__( 'Import Fixtures (CSV) Enhanced', 'enhanced-import-for-sportspress' );
         }
         return $importers;
     }
