@@ -35,9 +35,9 @@ require_once EIFS_PLUGIN_DIR . 'includes/class-eifs-plugin.php';
 
 // Bootstrap after all other plugins.
 add_action( 'plugins_loaded', static function (): void {
-    if ( eifs_is_sportspress_active() ) {
-        new EIFS_Plugin();
-    }
+	if ( eifs_is_sportspress_active() ) {
+		new EIFS_Plugin();
+	}
 }, PHP_INT_MAX );
 
 /**
@@ -46,23 +46,20 @@ add_action( 'plugins_loaded', static function (): void {
  * @return bool
  */
 function eifs_is_sportspress_active(): bool {
-    // Check for SportsPress main class or function
-    if ( class_exists( 'SportsPress' ) || function_exists( 'SP' ) ) {
-        return true;
-    }
-    
-    // Check if SportsPress plugin is active by looking for its autoloader
-    if ( class_exists( 'SP_Importer' ) ) {
-        return true;
-    }
-    
-    // Check if SportsPress Pro is active
-    if ( class_exists( 'SportsPress_Pro' ) ) {
-        return true;
-    }
-    
-    return false;
-}	
+	// Check for SportsPress main class or function
+	if ( class_exists( 'SportsPress' ) || function_exists( 'SP' ) ) {
+		return true;
+	}
 
+	// Check if SportsPress plugin is active by looking for its autoloader
+	if ( class_exists( 'SP_Importer' ) ) {
+		return true;
+	}
 
+	// Check if SportsPress Pro is active
+	if ( class_exists( 'SportsPress_Pro' ) ) {
+		return true;
+	}
 
+	return false;
+}

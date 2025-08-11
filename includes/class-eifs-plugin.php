@@ -88,5 +88,3 @@ class EIFS_Plugin {
         }
     }
 }
-
-
