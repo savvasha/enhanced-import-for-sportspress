@@ -5,7 +5,7 @@ Requires at least: 5.3
 Tested up to: 6.8
 Stable tag: 1.0
 License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-3.0.html
+License URI: https://www.gnu.org/licenses/gpl.html
 
 Extends SportsPress CSV importers with score/results support and enhanced functionality for importing fixtures with match outcomes.
 
@@ -19,6 +19,7 @@ This plugin enhances the standard SportsPress Fixtures (CSV) importer by adding 
 
 * **Score/Results Import**: Import match scores directly from CSV files
 * **Automatic Results Processing**: Automatically creates and updates match results using SportsPress's native results system
+* **Auto creation of Calendar and League table**: Teams are auto assigned to League Table.
 * **Backward Compatibility**: Works with existing SportsPress CSV formats while adding new capabilities
 
 ### Key Features

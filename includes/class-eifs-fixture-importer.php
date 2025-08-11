@@ -47,16 +47,16 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 		 */
 		public function __construct() {
 			$this->import_page  = 'sp_fixture_csv';
-			$this->import_label = esc_attr__( 'Import Fixtures (Enhanced)', 'sportspress' );
+			$this->import_label = esc_attr__( 'Import Fixtures (Enhanced)', 'enhanced-import-for-sportspress' );
 			$this->columns      = array(
-				'post_date'     => esc_attr__( 'Date', 'sportspress' ),
-				'post_time'     => esc_attr__( 'Time', 'sportspress' ),
-				'sp_venue'      => esc_attr__( 'Venue', 'sportspress' ),
-				'sp_home'       => esc_attr__( 'Home', 'sportspress' ),
-				'sp_away'       => esc_attr__( 'Away', 'sportspress' ),
+				'post_date'     => esc_attr__( 'Date', 'enhanced-import-for-sportspress' ),
+				'post_time'     => esc_attr__( 'Time', 'enhanced-import-for-sportspress' ),
+				'sp_venue'      => esc_attr__( 'Venue', 'enhanced-import-for-sportspress' ),
+				'sp_home'       => esc_attr__( 'Home', 'enhanced-import-for-sportspress' ),
+				'sp_away'       => esc_attr__( 'Away', 'enhanced-import-for-sportspress' ),
 				'sp_home_score' => esc_attr__( 'Home Score', 'enhanced-import-for-sportspress' ),
 				'sp_away_score' => esc_attr__( 'Away Score', 'enhanced-import-for-sportspress' ),
-				'sp_day'        => esc_attr__( 'Match Day', 'sportspress' ),
+				'sp_day'        => esc_attr__( 'Match Day', 'enhanced-import-for-sportspress' ),
 			);
 			$this->optionals    = array( 'sp_home_score', 'sp_away_score', 'sp_day' );
 		}
@@ -164,7 +164,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 						'post_type'   => 'sp_event',
 						'post_status' => 'publish',
 						'post_date'   => $date,
-						'post_title'  => esc_attr__( 'Event', 'sportspress' ),
+						'post_title'  => esc_attr__( 'Event', 'enhanced-import-for-sportspress' ),
 					);
 
 					// Insert event.
@@ -268,7 +268,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 								$title = get_the_title( $id );
 
 								// Initialize event name.
-								if ( esc_attr__( 'Event', 'sportspress' ) === $title ) {
+								if ( esc_attr__( 'Event', 'enhanced-import-for-sportspress' ) === $title ) {
 									$title = '';
 								} else {
 									$title .= ' ' . get_option( 'sportspress_event_teams_delimiter', 'vs' ) . ' ';
@@ -435,11 +435,13 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 
 			// Show Result.
 			echo '<div class="updated settings-error below-h2"><p>';
-			printf(
-				/* translators: 1: Number of imported events, 2: Number of skipped events */
-				'%s',
-				wp_kses_post( sprintf( __( 'Import complete - imported <strong>%1$s</strong> events and skipped <strong>%2$s</strong>.', 'sportspress' ), esc_html( $this->imported ), esc_html( $this->skipped ) ) )
+			$import_summary_message = sprintf(
+				/* translators: 1: Number of imported events. 2: Number of skipped events. */
+				__( 'Import complete - imported <strong>%1$s</strong> events and skipped <strong>%2$s</strong>.', 'enhanced-import-for-sportspress' ),
+				esc_html( $this->imported ),
+				esc_html( $this->skipped )
 			);
+			printf( '%s', wp_kses_post( $import_summary_message ) );
 			echo '</p></div>';
 
 			// Show if a table and/or a calendar were created, with links, and how many teams assigned to the new table.
@@ -452,7 +454,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 				echo '<div class="notice notice-success is-dismissible"><p>';
 				printf(
 					/* translators: 1: Table title, 2: Edit link, 3: Number of teams */
-					wp_kses_post( __( 'Table <strong>%1$s</strong> was created. <a href="%2$s">Edit Table</a>. <br />Assigned <strong>%3$d</strong> teams to the table.', 'sportspress' ) ),
+					wp_kses_post( __( 'Table <strong>%1$s</strong> was created. <a href="%2$s">Edit Table</a>. <br />Assigned <strong>%3$d</strong> teams to the table.', 'enhanced-import-for-sportspress' ) ),
 					esc_html( $table_title ),
 					esc_url( $table_edit_link ),
 					intval( $teams_count )
@@ -468,7 +470,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 				echo '<div class="notice notice-success is-dismissible"><p>';
 				printf(
 					/* translators: 1: Calendar title, 2: Edit link */
-					wp_kses_post( __( 'Calendar <strong>%1$s</strong> was created. <a href="%2$s">Edit Calendar</a>.', 'sportspress' ) ),
+					wp_kses_post( __( 'Calendar <strong>%1$s</strong> was created. <a href="%2$s">Edit Calendar</a>.', 'enhanced-import-for-sportspress' ) ),
 					esc_html( $calendar_title ),
 					esc_url( $calendar_edit_link )
 				);
@@ -483,7 +485,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 		 */
 		public function import_end(): void {
 			/* translators: 1: Notice text, 2: URL to fixtures list, 3: Link text */
-			printf( '<p>%1$s <a href="%2$s">%3$s</a></p>', esc_html__( 'All done!', 'sportspress' ), esc_url( admin_url( 'edit.php?post_type=sp_event' ) ), esc_html__( 'View Fixtures', 'sportspress' ) );
+			printf( '<p>%1$s <a href="%2$s">%3$s</a></p>', esc_html__( 'All done!', 'enhanced-import-for-sportspress' ), esc_url( admin_url( 'edit.php?post_type=sp_event' ) ), esc_html__( 'View Fixtures', 'enhanced-import-for-sportspress' ) );
 
 			do_action( 'import_end' );
 		}
@@ -496,9 +498,11 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 		 */
 		public function greet(): void {
 			echo '<div class="narrow">';
-			echo '<p>' . esc_html__( 'Hi there! Choose a .csv file to upload, then click "Upload file and import".', 'sportspress' ) . '</p>';
-			echo '<p>' . wp_kses_post( sprintf( __( 'Fixtures need to be defined with columns in a specific order (4+ columns). <a href="%s">Click here to download a sample</a>.', 'sportspress' ), esc_url( EIFS_PLUGIN_URL . 'dummy-data/fixtures-sample.csv' ) ) ) . '</p>';
-			echo '<p>' . wp_kses_post( sprintf( __( 'Supports CSV files generated by <a href="%s">LeagueLobster</a>.', 'sportspress' ), 'https://tboy.co/leaguelobster' ) ) . '</p>';
+			echo '<p>' . esc_html__( 'Hi there! Choose a .csv file to upload, then click "Upload file and import".', 'enhanced-import-for-sportspress' ) . '</p>';
+			// translators: 1: URL to the sample fixtures CSV file.
+			echo '<p>' . wp_kses_post( sprintf( __( 'Fixtures need to be defined with columns in a specific order (4+ columns). <a href="%s">Click here to download a sample</a>.', 'enhanced-import-for-sportspress' ), esc_url( EIFS_PLUGIN_URL . 'dummy-data/fixtures-sample.csv' ) ) ) . '</p>';
+			// translators: 1: URL to LeagueLobster website.
+			echo '<p>' . wp_kses_post( sprintf( __( 'Supports CSV files generated by <a href="%s">LeagueLobster</a>.', 'enhanced-import-for-sportspress' ), 'https://tboy.co/leaguelobster' ) ) . '</p>';
 			wp_import_upload_form( 'admin.php?import=sp_fixture_csv&step=1' );
 			echo '</div>';
 		}
@@ -514,53 +518,53 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 			<table class="form-table">
 				<tbody>
 					<tr>
-						<th scope="row"><label><?php esc_html_e( 'Format', 'sportspress' ); ?></label><br/></th>
+						<th scope="row"><label><?php esc_html_e( 'Format', 'enhanced-import-for-sportspress' ); ?></label><br/></th>
 						<td class="forminp forminp-radio" id="sp_formatdiv">
 							<fieldset id="post-formats-select">
 								<ul>
-									<li><input type="radio" name="sp_format" class="post-format" id="post-format-league" value="league" checked="checked"> <label for="post-format-league" class="post-format-icon post-format-league"><?php esc_html_e( 'Competitive', 'sportspress' ); ?></label></li>
-									<li><input type="radio" name="sp_format" class="post-format" id="post-format-friendly" value="friendly"> <label for="post-format-friendly" class="post-format-icon post-format-friendly"><?php esc_html_e( 'Friendly', 'sportspress' ); ?></label></li>
+									<li><input type="radio" name="sp_format" class="post-format" id="post-format-league" value="league" checked="checked"> <label for="post-format-league" class="post-format-icon post-format-league"><?php esc_html_e( 'Competitive', 'enhanced-import-for-sportspress' ); ?></label></li>
+									<li><input type="radio" name="sp_format" class="post-format" id="post-format-friendly" value="friendly"> <label for="post-format-friendly" class="post-format-icon post-format-friendly"><?php esc_html_e( 'Friendly', 'enhanced-import-for-sportspress' ); ?></label></li>
 								<br>
 						</fieldset>
 					</td>
 					</tr>
 					<tr>
-						<th scope="row"><label><?php esc_html_e( 'League', 'sportspress' ); ?></label><br/></th>
+						<th scope="row"><label><?php esc_html_e( 'League', 'enhanced-import-for-sportspress' ); ?></label><br/></th>
 						<td>
 						<?php
 						$args = array(
 							'taxonomy'         => 'sp_league',
 							'name'             => 'sp_league',
 							'values'           => 'slug',
-							'show_option_none' => esc_attr__( '&mdash; Not set &mdash;', 'sportspress' ),
+							'show_option_none' => esc_attr__( '&mdash; Not set &mdash;', 'enhanced-import-for-sportspress' ),
 						);
 						if ( ! sp_dropdown_taxonomies( $args ) ) :
-							echo '<p>' . esc_html__( 'None', 'sportspress' ) . '</p>';
-							sp_taxonomy_adder( 'sp_league', 'sp_team', esc_attr__( 'Add New', 'sportspress' ) );
+							echo '<p>' . esc_html__( 'None', 'enhanced-import-for-sportspress' ) . '</p>';
+							sp_taxonomy_adder( 'sp_league', 'sp_team', esc_attr__( 'Add New', 'enhanced-import-for-sportspress' ) );
 						endif;
 						?>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label><?php esc_html_e( 'Season', 'sportspress' ); ?></label><br/></th>
+						<th scope="row"><label><?php esc_html_e( 'Season', 'enhanced-import-for-sportspress' ); ?></label><br/></th>
 						<td>
 						<?php
 						$args = array(
 							'taxonomy'         => 'sp_season',
 							'name'             => 'sp_season',
 							'values'           => 'slug',
-							'show_option_none' => esc_attr__( '&mdash; Not set &mdash;', 'sportspress' ),
+							'show_option_none' => esc_attr__( '&mdash; Not set &mdash;', 'enhanced-import-for-sportspress' ),
 						);
 						if ( ! sp_dropdown_taxonomies( $args ) ) :
-							echo '<p>' . esc_html__( 'None', 'sportspress' ) . '</p>';
-							sp_taxonomy_adder( 'sp_season', 'sp_team', esc_attr__( 'Add New', 'sportspress' ) );
+							echo '<p>' . esc_html__( 'None', 'enhanced-import-for-sportspress' ) . '</p>';
+							sp_taxonomy_adder( 'sp_season', 'sp_team', esc_attr__( 'Add New', 'enhanced-import-for-sportspress' ) );
 						endif;
 						?>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row" class="titledesc">
-							<?php esc_html_e( 'Date Format', 'sportspress' ); ?>
+							<?php esc_html_e( 'Date Format', 'enhanced-import-for-sportspress' ); ?>
 						</th>
 						<td class="forminp forminp-radio">
 							<fieldset>

@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Enhanced Import for SportsPress
- * Description: Extends SportsPress Importers with extra abilities.
+ * Description: Extends SportsPress CSV importers with score/results support and enhanced functionality for importing fixtures with match outcomes.
  * Version: 1.0
  * Author: Savvas
  * Author URI: https://savvasha.com
@@ -9,6 +9,7 @@
  * Requires PHP: 7.4
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl.html
+ * Text Domain: enhanced-import-for-sportspress
  *
  * @package EnhancedImportForSportsPress
  */
