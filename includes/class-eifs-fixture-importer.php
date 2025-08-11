@@ -392,11 +392,16 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 					'posts_per_page' => -1,
 					'orderby'        => 'menu_order',
 					'order'          => 'ASC',
+					'status'         => 'publish',
 				);
 				$columns = new WP_Query( $columns_args );
 				$sp_import_columns = array();
-				foreach ( $columns as $column ) {
-					$sp_import_columns[] = $column->post_name;
+				if ( $columns->have_posts() ) {
+					while ( $columns->have_posts() ) {
+						$columns->the_post();
+						$sp_import_columns[] = get_post()->post_name;
+					}
+					wp_reset_postdata();
 				}
 				update_post_meta( $table_id, 'sp_columns', $sp_import_columns );
 			}
