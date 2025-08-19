@@ -487,7 +487,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 			/* translators: 1: Notice text, 2: URL to fixtures list, 3: Link text */
 			printf( '<p>%1$s <a href="%2$s">%3$s</a></p>', esc_html__( 'All done!', 'enhanced-import-for-sportspress' ), esc_url( admin_url( 'edit.php?post_type=sp_event' ) ), esc_html__( 'View Fixtures', 'enhanced-import-for-sportspress' ) );
 
-			do_action( 'import_end' );
+			do_action( 'eifs_import_end' );
 		}
 
 		/**
