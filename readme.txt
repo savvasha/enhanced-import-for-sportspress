@@ -76,9 +76,9 @@ Yes, you can import CSV files with missing optional columns. Only Date, Home tea
 
 == Screenshots ==
 
-1. Enhanced import interface with score columns
-2. CSV sample file showing the new format
-3. Import results
+1. You can use the native Import button at SportsPress->Events area
+2. Or you use the Import tool directly from Tools->Import.
+3. Enhanced import interface with score columns and option for auto creation of league table and calendar.
 
 == Changelog ==
 
@@ -94,4 +94,4 @@ Initial release of Enhanced Import for SportsPress with score support and enhanc
 
 * Built for SportsPress by [Savvas](https://savvasha.com/)
 * Based on the original SportsPress importers by [ThemeBoy](https://www.themeboy.com/)
-* Licensed under GPL v3
+* Licensed under GPLv2 or later
