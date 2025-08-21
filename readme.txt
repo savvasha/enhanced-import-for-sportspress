@@ -38,12 +38,10 @@ The enhanced importer adds extra the following CSV columns:
 
 ### Example CSV Format
 
-```
-Date,Time,Venue,Home,Away,Home Score,Away Score,Match Day
-2024/01/15,19:30,Stadium A,Team Alpha,Team Beta,2,1,GW1
-2024/01/20,20:00,Stadium B,Team Gamma,Team Delta,0,3,GW2
-2024/01/25,18:45,Stadium A,Team Beta,Team Gamma,1,1,GW2
-```
+    Date,Time,Venue,Home,Away,Home Score,Away Score,Match Day
+    2024/01/15,19:30,Stadium A,Team Alpha,Team Beta,2,1,GW1
+    2024/01/20,20:00,Stadium B,Team Gamma,Team Delta,0,3,GW2
+    2024/01/25,18:45,Stadium A,Team Beta,Team Gamma,1,1,GW2
 
 == Installation ==
 
