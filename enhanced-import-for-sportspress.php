@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Enhanced Import for SportsPress
- * Description: Extends SportsPress CSV importers with score/results support and enhanced functionality for importing fixtures with match outcomes.
- * Version: 1.0
+ * Description: Extends SportsPress CSV importers: fixtures with scores/results, and players with update-by-ID and metric columns.
+ * Version: 2.0
  * Author: Savvas
  * Author URI: https://savvasha.com
  * Requires at least: 5.3

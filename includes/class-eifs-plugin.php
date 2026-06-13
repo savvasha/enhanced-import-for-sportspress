@@ -22,20 +22,26 @@ class EIFS_Plugin {
 	 */
 	public function __construct() {
 		// Extend importer UI: add score columns and behaviors.
-		add_filter( 'sportspress_importers', array( $this, 'eifs_replace_fixture_importer_callback' ), 99 );
+		add_filter( 'sportspress_importers', array( $this, 'eifs_replace_importer_callbacks' ), 99 );
 	}
 
 	/**
-	 * Replace the built-in Fixtures (CSV) importer callback so we can add score columns
-	 * and auto-create `sp_table` and `sp_calendar` after import.
+	 * Replace the built-in importer callbacks so we can extend their functionality.
+	 *
+	 * Fixtures (CSV): adds score columns and auto-creates `sp_table` and `sp_calendar`.
+	 * Players (CSV): adds a Player ID column for update-by-ID and dynamic metric columns.
 	 *
 	 * @param array $importers Importers map passed through filter.
 	 * @return array
 	 */
-	public function eifs_replace_fixture_importer_callback( array $importers ): array {
+	public function eifs_replace_importer_callbacks( array $importers ): array {
 		if ( isset( $importers['sp_fixture_csv'] ) ) {
 			$importers['sp_fixture_csv']['callback'] = array( $this, 'eifs_fixtures_importer' );
 			$importers['sp_fixture_csv']['name']     = esc_attr__( 'Import Fixtures (CSV) Enhanced', 'enhanced-import-for-sportspress' );
+		}
+		if ( isset( $importers['sp_player_csv'] ) ) {
+			$importers['sp_player_csv']['callback'] = array( $this, 'eifs_players_importer' );
+			$importers['sp_player_csv']['name']     = esc_attr__( 'Import Players (CSV) Enhanced', 'enhanced-import-for-sportspress' );
 		}
 		return $importers;
 	}
@@ -61,6 +67,30 @@ class EIFS_Plugin {
 		}
 
 		$importer = new EIFS_Fixture_Importer();
+		$importer->dispatch();
+	}
+
+	/**
+	 * Callback used by Tools > Import for Players (CSV).
+	 * Loads our extended importer that supports update-by-ID and metric columns.
+	 */
+	public function eifs_players_importer(): void {
+		// Load dependencies.
+		$this->load_sportspress_importer_classes();
+
+		if ( ! class_exists( 'SP_Importer' ) ) {
+			wp_die( esc_html__( 'SportsPress importer base class is not available. Ensure SportsPress is active.', 'enhanced-import-for-sportspress' ) );
+		}
+
+		if ( ! class_exists( 'EIFS_Player_Importer' ) ) {
+			require_once EIFS_PLUGIN_DIR . 'includes/class-eifs-player-importer.php';
+		}
+
+		if ( ! class_exists( 'EIFS_Player_Importer' ) ) {
+			wp_die( esc_html__( 'Enhanced Player Importer class could not be loaded.', 'enhanced-import-for-sportspress' ) );
+		}
+
+		$importer = new EIFS_Player_Importer();
 		$importer->dispatch();
 	}
 
