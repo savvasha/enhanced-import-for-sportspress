@@ -1,6 +1,6 @@
 === Enhanced Import for SportsPress ===
 Contributors: savvasha
-Tags: events, fixtures, players, import, scores, metrics
+Tags: fixtures, players, import, scores, metrics
 Requires at least: 5.3
 Tested up to: 7.0
 Stable tag: 2.0
