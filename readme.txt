@@ -2,8 +2,8 @@
 Contributors: savvasha
 Tags: fixtures, players, import, scores, metrics
 Requires at least: 5.3
-Tested up to: 7.0
-Stable tag: 2.0
+Tested up to: 7.1
+Stable tag: 2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl.html
 
@@ -104,6 +104,10 @@ Yes, you can import CSV files with missing optional columns. Only Date, Home tea
 
 == Changelog ==
 
+= 2.1 =
+* Fixed: the selected League (and Season) was not assigned to imported events, teams, calendars, or league tables when the taxonomy term used a non-Latin (e.g. Greek) slug. Such slugs are stored percent-encoded and were being stripped by sanitize_text_field(); they are now handled with sanitize_title() and validated against existing terms.
+* Fixed: existing calendar/league table detection used an invalid WP_Query property (`->ID`), which could break re-imports; it now reads the queried post correctly.
+
 = 2.0 =
 * Added an enhanced Players (CSV) importer with a Player ID column (update existing players by ID) and dynamic metric columns.
 
@@ -111,6 +115,9 @@ Yes, you can import CSV files with missing optional columns. Only Date, Home tea
 * Initial release
 
 == Upgrade Notice ==
+
+= 2.1 =
+Fixes League/Season not being assigned to imports when the term slug is non-Latin (e.g. Greek). Recommended for all users.
 
 = 2.0 =
 Adds an enhanced Players (CSV) importer with update-by-ID and metric column support.
