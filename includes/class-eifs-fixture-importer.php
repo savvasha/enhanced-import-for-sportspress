@@ -87,11 +87,20 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 			}
 
 			$event_format = isset( $_POST['sp_format'] ) ? sanitize_key( wp_unslash( $_POST['sp_format'] ) ) : false;
-			$league_input = isset( $_POST['sp_league'] ) ? sanitize_text_field( wp_unslash( $_POST['sp_league'] ) ) : '-1';
-			$league       = ( '-1' === $league_input ) ? false : $league_input;
-			$season_input = isset( $_POST['sp_season'] ) ? sanitize_text_field( wp_unslash( $_POST['sp_season'] ) ) : '-1';
-			$season       = ( '-1' === $season_input ) ? false : $season_input;
-			$date_format  = isset( $_POST['sp_date_format'] ) ? sanitize_text_field( wp_unslash( $_POST['sp_date_format'] ) ) : 'yyyy/mm/dd';
+
+			// League/season values are taxonomy slugs. For non-Latin (e.g. Greek) terms the slug is
+			// percent-encoded, and sanitize_text_field() would strip the %xx octets and destroy it.
+			// sanitize_title() preserves encoded octets and is an approved input sanitizer. The slug is
+			// then validated by resolving it to an actual term; a missing/"not set" value yields false.
+			$league_slug = isset( $_POST['sp_league'] ) ? sanitize_title( wp_unslash( $_POST['sp_league'] ) ) : '';
+			$league_term = ( '' !== $league_slug ) ? get_term_by( 'slug', $league_slug, 'sp_league' ) : false;
+			$league      = $league_term ? $league_term->slug : false;
+
+			$season_slug = isset( $_POST['sp_season'] ) ? sanitize_title( wp_unslash( $_POST['sp_season'] ) ) : '';
+			$season_term = ( '' !== $season_slug ) ? get_term_by( 'slug', $season_slug, 'sp_season' ) : false;
+			$season      = $season_term ? $season_term->slug : false;
+
+			$date_format = isset( $_POST['sp_date_format'] ) ? sanitize_text_field( wp_unslash( $_POST['sp_date_format'] ) ) : 'yyyy/mm/dd';
 
 			foreach ( $rows as $row ) :
 
@@ -316,13 +325,13 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 			// Remove duplicates from teams_ids array.
 			$teams_clean = array_unique( $this->teams_ids );
 
-			// Get league and season objects by slug.
-			$league_object = get_term_by( 'slug', $league, 'sp_league' );
-			$season_object = get_term_by( 'slug', $season, 'sp_season' );
+			// Reuse the league and season term objects resolved during input parsing.
+			$league_object = $league_term;
+			$season_object = $season_term;
 
-			// Get league and season IDs.
-			$league_id = $league_object->term_id;
-			$season_id = $season_object->term_id;
+			// Get league and season IDs (guard against missing terms).
+			$league_id = $league_object ? $league_object->term_id : 0;
+			$season_id = $season_object ? $season_object->term_id : 0;
 
 			if ( isset( $_POST['eifs_auto_create_calendar'] ) && 'yes' === sanitize_text_field( wp_unslash( $_POST['eifs_auto_create_calendar'] ) ) ) {
 				// Check if a calendar exists for the league and season.
@@ -348,8 +357,8 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 					),
 				);
 				$calendars = new WP_Query( $args );
-				if ( ! empty( $calendars->post ) ) {
-					$calendar_id = $calendars->ID;
+				if ( ! empty( $calendars->posts ) ) {
+					$calendar_id = $calendars->posts[0]->ID;
 				} else {
 					// Create new calendar.
 					$calendar_id = wp_insert_post(
@@ -391,8 +400,8 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 					),
 				);
 				$tables = new WP_Query( $args );
-				if ( ! empty( $tables->post ) ) {
-					$table_id = $tables->ID;
+				if ( ! empty( $tables->posts ) ) {
+					$table_id = $tables->posts[0]->ID;
 				} else {
 					$table_id = wp_insert_post(
 						array(
