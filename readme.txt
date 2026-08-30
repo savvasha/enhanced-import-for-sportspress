@@ -107,6 +107,7 @@ Yes, you can import CSV files with missing optional columns. Only Date, Home tea
 = 2.1 =
 * Fixed: the selected League (and Season) was not assigned to imported events, teams, calendars, or league tables when the taxonomy term used a non-Latin (e.g. Greek) slug. Such slugs are stored percent-encoded and were being stripped by sanitize_text_field(); they are now handled with sanitize_title() and validated against existing terms.
 * Fixed: existing calendar/league table detection used an invalid WP_Query property (`->ID`), which could break re-imports; it now reads the queried post correctly.
+* Fixed: the home team's venue is now auto-assigned to imported events even when the Venue column is disabled/omitted (not only when left blank), restoring parity with the native SportsPress fixture importer.
 
 = 2.0 =
 * Added an enhanced Players (CSV) importer with a Player ID column (update existing players by ID) and dynamic metric columns.

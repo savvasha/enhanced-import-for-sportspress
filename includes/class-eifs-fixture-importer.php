@@ -197,8 +197,10 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 						wp_set_object_terms( $id, $season, 'sp_season', false );
 					endif;
 
-					// Update venue.
-					if ( '' === $venue ) {
+					// Update venue. Use empty() so the home-team venue is auto-filled both when the
+					// column is blank ('') and when it is disabled/omitted (null), matching the
+					// behaviour of the native SportsPress fixture importer.
+					if ( empty( $venue ) ) {
 						$team        = reset( $teams );
 						$team_object = eifs_get_post_by_title( stripslashes( $team ), 'sp_team' );
 						$venue       = sp_get_the_term_id( $team_object->ID, 'sp_venue' );
