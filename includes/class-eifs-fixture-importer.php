@@ -69,7 +69,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 		 * @param array $columns Array of columns to import.
 		 * @return void
 		 */
-		public function import( $array = array(), $columns = array( 'post_title' ) ): void {
+		public function import( $array = array(), $columns = array( 'post_title' ) ): void { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound -- Parameter name mirrors the overridden SP_Importer::import() signature.
 
 			$this->imported = 0;
 			$this->skipped  = 0;
@@ -213,7 +213,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 					}
 
 					// Increment.
-					$this->imported ++;
+					++$this->imported;
 
 				endif;
 
@@ -337,13 +337,14 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 
 			if ( isset( $_POST['eifs_auto_create_calendar'] ) && 'yes' === sanitize_text_field( wp_unslash( $_POST['eifs_auto_create_calendar'] ) ) ) {
 				// Check if a calendar exists for the league and season.
-				$args      = array(
+				$args = array(
 					'post_type'      => array( 'sp_calendar' ),
 					'post_status'    => 'publish',
 					'posts_per_page' => 1,
 					'no_found_rows'  => true,
 					'orderby'        => 'post_date ID',
 					'order'          => 'ASC',
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- One-time admin import; an existing calendar/table is located by its league + season terms.
 					'tax_query'      => array(
 						'relation' => 'AND',
 						array(
@@ -380,13 +381,14 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 			}
 			if ( isset( $_POST['eifs_auto_create_league_table'] ) && 'yes' === sanitize_text_field( wp_unslash( $_POST['eifs_auto_create_league_table'] ) ) ) {
 				// Check if a table exists for the league and season.
-				$args   = array(
+				$args = array(
 					'post_type'      => array( 'sp_table' ),
 					'post_status'    => 'publish',
 					'posts_per_page' => 1,
 					'no_found_rows'  => true,
 					'orderby'        => 'post_date ID',
 					'order'          => 'ASC',
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- One-time admin import; an existing calendar/table is located by its league + season terms.
 					'tax_query'      => array(
 						'relation' => 'AND',
 						array(
@@ -638,7 +640,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 	if ( ! class_exists( 'WP_Importer' ) ) {
 		add_action(
 			'admin_notices',
-			function() {
+			function () {
 				echo '<div class="notice notice-error"><p>' . esc_html__( 'Enhanced Import for SportsPress requires WordPress Importer to be available.', 'enhanced-import-for-sportspress' ) . '</p></div>';
 			}
 		);
@@ -646,7 +648,7 @@ if ( ! class_exists( 'EIFS_Fixture_Importer' ) ) {
 	if ( ! class_exists( 'SP_Importer' ) ) {
 		add_action(
 			'admin_notices',
-			function() {
+			function () {
 				echo '<div class="notice notice-error"><p>' . esc_html__( 'Enhanced Import for SportsPress requires SportsPress plugin to be installed and activated.', 'enhanced-import-for-sportspress' ) . '</p></div>';
 			}
 		);

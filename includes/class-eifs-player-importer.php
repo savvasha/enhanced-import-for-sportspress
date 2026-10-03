@@ -114,7 +114,7 @@ if ( ! class_exists( 'EIFS_Player_Importer' ) ) {
 		 * @param array $columns Array of columns to import.
 		 * @return void
 		 */
-		public function import( $array = array(), $columns = array( 'post_title' ) ): void {
+		public function import( $array = array(), $columns = array( 'post_title' ) ): void { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound -- Parameter name mirrors the overridden SP_Importer::import() signature.
 
 			$this->imported = 0;
 			$this->skipped  = 0;
@@ -221,7 +221,7 @@ if ( ! class_exists( 'EIFS_Player_Importer' ) ) {
 				if ( ! $id ) {
 
 					if ( ! $name ) :
-						$this->skipped++;
+						++$this->skipped;
 						continue;
 					endif;
 
@@ -332,7 +332,7 @@ if ( ! class_exists( 'EIFS_Player_Importer' ) ) {
 						add_post_meta( $id, 'sp_past_team', $team_id );
 					endif;
 
-					$i++;
+					++$i;
 				endforeach;
 
 				// Update nationality.
@@ -352,7 +352,7 @@ if ( ! class_exists( 'EIFS_Player_Importer' ) ) {
 				}
 				update_post_meta( $id, 'sp_metrics', $metrics );
 
-				$this->imported++;
+				++$this->imported;
 
 			endforeach;
 
@@ -458,7 +458,7 @@ if ( ! class_exists( 'EIFS_Player_Importer' ) ) {
 	if ( ! class_exists( 'WP_Importer' ) ) {
 		add_action(
 			'admin_notices',
-			function() {
+			function () {
 				echo '<div class="notice notice-error"><p>' . esc_html__( 'Enhanced Import for SportsPress requires WordPress Importer to be available.', 'enhanced-import-for-sportspress' ) . '</p></div>';
 			}
 		);
@@ -466,7 +466,7 @@ if ( ! class_exists( 'EIFS_Player_Importer' ) ) {
 	if ( ! class_exists( 'SP_Importer' ) ) {
 		add_action(
 			'admin_notices',
-			function() {
+			function () {
 				echo '<div class="notice notice-error"><p>' . esc_html__( 'Enhanced Import for SportsPress requires SportsPress plugin to be installed and activated.', 'enhanced-import-for-sportspress' ) . '</p></div>';
 			}
 		);

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<ruleset name="Enhanced Import for SportsPress">
+	<description>WordPress Coding Standards for Enhanced Import for SportsPress (PHP).</description>
+
+	<!-- Scan the current directory. -->
+	<file>.</file>
+
+	<!-- Only scan PHP files; this plugin ships no JS/CSS. -->
+	<arg name="extensions" value="php"/>
+
+	<!-- Exclude third-party code and build artifacts. -->
+	<exclude-pattern>*/assets/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+
+	<!-- Show sniff codes and progress. -->
+	<arg value="ps"/>
+
+	<!-- Minimum supported WordPress version. -->
+	<config name="minimum_wp_version" value="5.3"/>
+
+	<!-- The WordPress Coding Standards ruleset. -->
+	<rule ref="WordPress"/>
+
+	<!-- Check PHP cross-version compatibility (minimum supported PHP). -->
+	<config name="testVersion" value="7.4-"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<!-- Verify text domain. -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="enhanced-import-for-sportspress"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Verify global prefixes. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="eifs"/>
+				<element value="EIFS"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>
